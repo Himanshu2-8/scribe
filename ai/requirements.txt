@@ -1,0 +1,22 @@
+# Web Framework & Server
+fastapi
+uvicorn
+python-multipart
+
+# Utilities & System
+python-dotenv
+pydantic
+yt-dlp
+
+# Core LangChain Ecosystem
+langchain-community
+langchain-core
+langchain-text-splitters
+
+# Free AI Integration Ecosystem
+langchain-groq
+langchain-google-genai
+
+# Baseline Raw SDKs (Required under the hood by integrations)
+groq
+google-genai
