@@ -8,25 +8,31 @@ Scribe is an entirely free, open-source **Retrieval-Augmented Generation (RAG)**
 
 Scribe utilizes a split-stack architecture, isolating client-side user experience from resource-heavy AI processing pipelines.
 
-              ┌──────────────────────────────────────────┐
-              │            Next.js Frontend              │
-              │   (Clerk Auth, shadcn/ui, Tailwind)      │
-              └────────────┬───────────────────▲─────────┘
-                           │ (1) Post URL      │ (4) Render
-                           │     or File       │     Transcript & Chat
-                           ▼                   │
-┌──────────────────────────────────────────────┴──────────────────────────┐
-│                            FastAPI Backend                              │
-│                    (LangChain, yt-dlp, Uvicorn)                         │
-└──────────┬───────────────────────┬───────────────────────┬──────────────┘
-           │                       │                       │
-           │ (2) Download          │ (3) High-Speed        │ (3b) Massive Context
-           ▼                       ▼     Audio Payload     ▼      Inference
-     ┌───────────┐           ┌───────────┐           ┌───────────┐
-     │  YouTube  │           │   Groq    │           │  Mistral  │
-     │ (via CDN) │           │ (Whisper) │           │ (Mistral) │
-     └───────────┘           └───────────┘           └───────────┘
+```mermaid
+flowchart TD
+    %% Nodes
+    FE["Next.js Frontend<br/><i>(Clerk Auth, shadcn/ui, Tailwind)</i>"]
+    BE["FastAPI Backend<br/><i>(LangChain, yt-dlp, Uvicorn)</i>"]
+    YT["YouTube<br/><i>(via CDN)</i>"]
+    GQ["Groq<br/><i>(Whisper)</i>"]
+    MS["Mistral<br/><i>(Mistral)</i>"]
 
+    %% Styling
+    classDef frontend fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef backend fill:#022c22,stroke:#10b981,stroke-width:2px,color:#f8fafc;
+    classDef service fill:#1e293b,stroke:#64748b,stroke-width:1.5px,color:#e2e8f0;
+
+    class FE frontend;
+    class BE backend;
+    class YT,GQ,MS service;
+
+    %% Flows
+    FE -->|"(1) Post URL or File"| BE
+    BE -->|"(2) Download"| YT
+    BE -->|"(3) High-Speed Audio Payload"| GQ
+    BE -->|"(3b) Massive Context Inference"| MS
+    BE -->|"(4) Render Transcript & Chat"| FE
+```
 
 
 1. **Ingestion & Extraction:** The frontend captures a video URL or an uploaded audio recording and ships it to the Python gateway. YouTube payloads are streamed dynamically via `yt-dlp` and isolated down to pure `.mp3` tracks.
